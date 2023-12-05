@@ -1,0 +1,129 @@
+index -> <!DOCTYPE html>
+<html>
+<head>
+    <title>Diccionario Panameño</title>
+</head>
+<body>
+    <h1>DICCIONARIO PANAMEÑO</h1>
+    <form method="POST">
+        <select name="opcion">
+            <option value="1">Agregar nueva palabra</option>
+            <option value="2">Editar palabra existente</option>
+            <option value="3">Eliminar palabra existente</option>
+            <option value="4">Ver listado de palabras</option>
+            <option value="5">Buscar significado de palabra</option>
+        </select>
+        <input type="submit" value="Seleccionar">
+    </form>
+</body>
+</html>
+---------------------------
+agregar.html -> <!DOCTYPE html>
+<html>
+<head>
+    <title>Agregar Palabra</title>
+</head>
+<body>
+    <h1>AGREGAR PALABRA</h1>
+    <form method="post" action="/agregar">
+        <label for="palabra">Ingrese la palabra:</label>
+        <input type="text" name="palabra" id="palabra">
+        <br>
+        <label for="significado">Ingrese el significado de la palabra:</label>
+        <input type="text" name="significado" id="significado">
+        <button type="submit">Agregar</button>
+    </form>
+    <a href="/">Volver al menú principal</a>
+</body>
+</html>
+--------------------------------
+buscar.html -> <!DOCTYPE html>
+<html>
+<head>
+    <title>Buscar Significado</title>
+</head>
+<body>
+    <h1>BUSCAR SIGNIFICADO</h1>
+    <form method="post" action="/buscar">
+        <label for="palabra">Ingrese palabra:</label>
+        <input type="text" name="palabra" id="palabra">
+        <button type="submit">Buscar</button>
+    </form>
+    <a href="/">Volver al menú principal</a>
+</body>
+</html>
+--------------------------------------
+editar -> <!DOCTYPE html>
+<html>
+<head>
+    <title>Editar Palabra</title>
+</head>
+<body>
+    <h1>EDITAR PALABRA</h1>
+    <form method="post" action="/editar">
+        <label for="palabra">Ingrese la palabra a editar:</label>
+        <input type="text" name="palabra" id="palabra">
+        <br>
+        <label for="nuevo_significado">Nuevo significado:</label>
+        <input type="text" name="nuevo_significado" id="nuevo_significado">
+        <button type="submit">Editar</button>
+    </form>
+    <a href="/">Volver al menú principal</a>
+</body>
+</html>
+---------------------------------------
+eliminar -> <!DOCTYPE html>
+<html>
+<head>
+    <title>Eliminar Palabra</title>
+</head>
+<body>
+    <h1>ELIMINAR PALABRA</h1>
+    <form method="post" action="/eliminar">
+        <label for="palabra">Ingrese la palabra a eliminar:</label>
+        <input type="text" name="palabra" id="palabra">
+        <button type="submit">Eliminar</button>
+    </form>
+
+    <a href="/">Volver al menú principal</a>
+</body>
+</html>
+-----------------------------
+listado -> <!DOCTYPE html>
+<html>
+<head>
+    <title>Listado de Palabras</title>
+</head>
+<body>
+    <h1>LISTADO DE PALABRAS</h1>
+    <ul>
+        {% for palabra in palabras %}
+            <li>{{ palabra }}</li>
+        {% endfor %}
+    </ul>
+    <a href="/">Volver al menú principal</a>
+</body>
+</html>
+--------------------------------------
+mensaje -> <!DOCTYPE html>
+<html>
+<head>
+    <title>Mensaje</title>
+</head>
+<body>
+    <p>{{ mensaje }}</p>
+    <a href="/">Volver al menú principal</a>
+</body>
+</html>
+----------------------------
+significado -> <!DOCTYPE html>
+<html>
+<head>
+    <title>Significado de Palabra</title>
+</head>
+<body>
+    <h1>SIGNIFICADO DE PALABRA</h1>
+    <p>'{{ palabra }}': {{ significado }}</p>
+    <a href="/">Volver al menú principal</a>
+</body>
+</html>
