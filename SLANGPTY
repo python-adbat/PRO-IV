@@ -1,0 +1,172 @@
+import sqlite3
+import time
+# CONEXIÓN CON LA BASE DE DATOS
+conn = sqlite3.connect('Diccionario Panameño')
+# CREACIÓN DE TABLA "DICCIONARIO"
+conn.execute('''CREATE TABLE IF NOT EXISTS DICCIONARIO
+                (PALABRA TEXT PRIMARY KEY,
+                SIGNIFICADO TEXT NOT NULL);''')
+
+# MENÚ DE DICCIONARIO
+while True:
+    print("\n\n--<| DICCIONARIO PANAMEÑO |>--")
+    print("1. Agregar nueva palabra.")
+    print("2. Editar palabra existente.")
+    print("3. Eliminar palabra existente.")
+    print("4. Ver listado de palabras.")
+    print("5. Buscar significado de palabra.")
+    print("6. Salir.")
+    try:
+        opcion = int(input("Opcion: "))
+    except:
+        print("ERR::Opcion invalida.")
+        opcion = 999
+        time.sleep(3)
+    # OPCION AGREGAR UNA PALABRA
+    if opcion == 1:
+            print("\n¡Vamos agregar una nueva palabra!")
+            time.sleep(1)
+            continuar = True
+            while continuar:
+                try:
+                    # L37-39 REVISA SI LA PALABRA EXISTE EN EL DICCIONARIO
+                    palabra = input("\nEscriba una nueva palabra: ")
+                    busca = conn.execute("SELECT PALABRA FROM DICCIONARIO WHERE PALABRA = ?", (palabra,))
+                    row = busca.fetchone()
+                    # CONTINUA CON LA ADICIÓN DE LA NUEVA PALABRA
+                    if not row:
+                        significado = input("Escriba el significado: ")
+                        conn.execute('INSERT INTO DICCIONARIO(palabra, significado) VALUES(?, ?)', (palabra, significado))
+                        print("\n¡Palabra agregada con exito!")
+                        time.sleep(1)
+                        print("\n REGRESANDO AL MENU...")
+                        conn.commit()
+                        time.sleep(1)
+                        continuar = False
+                    else:
+                        print("\nERR::La palabra ya existe, intente con otra.")
+                        time.sleep(2)
+                except:
+                    print("\nERR::ERROR AL AGREGAR. REGRESANDO AL MENU...")
+                    time.sleep(2)
+                    continuar = False
+    # OPCION EDITAR PALABRA
+    if opcion == 2:
+        # REVISA SI EL DICCIONARIO ESTÁ VACÍO
+        busca = conn.execute('SELECT * FROM DICCIONARIO')
+        registro = busca.fetchall()
+        if registro:
+            print("\nVamos a editar una palabra existente...")
+            time.sleep(1)
+            continuar = True
+            while continuar:
+                try:
+                    # REVISA SI LA PALABRA EXISTE EN EL DICCIONARIO
+                    edit_palabra = input("\nEscriba la palabra que desea editar: ")
+                    busca = conn.execute('SELECT * FROM DICCIONARIO WHERE PALABRA = ?', (edit_palabra,))
+                    row = busca.fetchone()
+                    # CONTINUA CON LA EDICIÓN DE LA PALABRA
+                    if row:
+                        new_significado = input("Escriba el nuevo significado: ")
+                        conn.execute('UPDATE DICCIONARIO SET SIGNIFICADO = ? WHERE PALABRA = ?', (new_significado, edit_palabra))
+                        print("\n¡Palabra editada con éxito!")
+                        time.sleep(1)
+                        print("\nREGRESANDO AL MENU...")
+                        conn.commit()
+                        time.sleep(1)
+                        continuar = False
+                    else:
+                        print("\nERR::La palabra no existe, intente otra vez.")
+                        time.sleep(2)
+                except:
+                    print("\nERR::ERROR DE BUSQUEDA. REGRESANDO AL MENU...")
+                    time.sleep(2)
+                    continuar = False
+        else:
+            print("\nDiccionario vacío. Intente añadir una palabra.")
+            time.sleep(3)
+
+    if opcion == 3:
+        # REVISA SI EL DICCIONARIO ESTÁ VACÍO
+        busca = conn.execute('SELECT * FROM DICCIONARIO')
+        registro = busca.fetchall()
+        if registro:
+            print("\nVamos a eliminar una palabra...")
+            time.sleep(1)
+            continuar = True
+            while continuar:
+                try:
+                    # REVISA SI LA PALABRA A ELIMINAR EXISTE EN EL DICCIONARIO
+                    palabra = input("\nEscriba la palabra que quiere eliminar: ")
+                    busca = conn.execute('SELECT * FROM DICCIONARIO WHERE PALABRA = ?', (palabra,))
+                    row = busca.fetchone()
+                    if row:
+                        # ELIMINA LA PALABRA DESPUES DE VERIFICAR QUE SI EXISTE
+                        conn.execute('DELETE FROM DICCIONARIO WHERE PALABRA = ?', (palabra,))
+                        print("\n¡Palabra eliminada con exito!")
+                        time.sleep(1)
+                        print("\nREGRESANDO AL MENU...")
+                        conn.commit()
+                        time.sleep(1)
+                        continuar = False
+                    else:
+                        print("\nERR::La palabra no existe, intente otra vez.")
+                        time.sleep(2)
+                except:
+                    print("\nERR::ERROR AL ELIMINAR. REGRESANDO AL MENU...")
+                    time.sleep(2)
+                    continuar = False
+        else:
+            print("\nDiccionario vacío. Intente añadir una palabra primero.")
+            time.sleep(3)
+
+    if opcion == 4:
+        # REVISA SI EL DICCIONARIO ESTÁ VACÍO
+        busca = conn.execute('SELECT * FROM DICCIONARIO')
+        registro = busca.fetchall()
+        # DESPUES DE VERIFICAR QUE SI HAYAN PALABRAS EN EL DICCIONARIO, LAS IMPRIME
+        if registro:
+            print("\nVamos a ver las palabras del diccionario...\n")
+            time.sleep(1)
+            palabras = conn.execute('SELECT * FROM DICCIONARIO ORDER BY PALABRA')
+            for diccionario in palabras:
+                print(str(diccionario[0])+". ")
+            print(input("\nPresiona enter para continuar -> "))
+        else:
+            print("\nDiccionario vacío. Intente añadir una palabra primero.")
+            time.sleep(3)
+    #OPCION BUSCAR SIGNIFICADO
+    if opcion == 5:
+        # REVISA SI EL DICCIONARIO ESTÁ VACÍO
+        busca = conn.execute('SELECT * FROM DICCIONARIO')
+        registro = busca.fetchall()
+        if registro:
+            print("\nVamos a buscar el significado de una palabra...")
+            time.sleep(1)
+            continuar = True
+            while continuar:
+                try:
+                    # REVISA SI LA PALABRA EXISTE
+                    palabra = input("\nEscriba la palabra que desea buscar: ")
+                    busca = conn.execute('SELECT SIGNIFICADO FROM DICCIONARIO WHERE PALABRA = ?', (palabra,))
+                    row = busca.fetchone()
+                    if row:
+                        print(palabra+": " +row[0])
+                        continuar = False
+                        print(input("\nPresiona enter para continuar -> "))
+                    else:
+                        print("\nERR::La palabra no existe, intente otra vez.")
+                        time.sleep(2)
+                except:
+                    print("\nERR:: ERROR DE BUSQUEDA. REGRESANDO AL MENU...")
+                    time.sleep(2)
+                    continuar = False
+        else:
+            print("\nDiccionario vacío. Intente añadir una palabra primero.")
+            time.sleep(3)
+    # OPCION SALIR
+    if opcion == 6:
+        conn.close
+        print("\nSALIENDO...")
+        time.sleep(1)
+        exit()
