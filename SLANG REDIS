@@ -1,0 +1,109 @@
+import redis
+
+r = redis.Redis(host = "redis-14066.c124.us-central1-1.gce.cloud.redislabs.com", port = 14066, db =0, password= "AiKQpL6lKSlkGOK2nVM10oT3zCBeUN3u")
+
+def aggpalabra(r):
+    print("\nAGREGAR PALABRA")
+    while True:
+        try:
+            palabra = input("\nIngrese la palabra: ").lower()
+            revisar = r.get(palabra)
+            if revisar:
+                print("\nPALABRA EXISTENTE, INTENTE CON OTRA.")
+            else:
+                significado = input("Ingrese el significado de la palabra: ")
+                r.set(palabra, significado)
+                print("\nPALABRA AGREGADA CORRECTAMENTE.")
+            break
+        except Exception as e:
+            print(f"\nERR::ERROR AL AGREGAR: {e}. INTENTE DE NUEVO.")
+
+def editpalabra(r):
+    print("\nEDITAR PALABRA")
+    while True:
+        try:
+            palabra = input("\nIngrese la palabra: ").lower()
+            revisar = r.get(palabra)
+            if revisar:
+                nuevo_significado = input("Ingrese el nuevo significado: ")
+                r.set(palabra, nuevo_significado)
+                print("\nPALABRA EDITADA CORRECTAMENTE.")
+                break
+            else:
+                print("\nPALABRA NO EXISTENTE, INTENTE CON OTRA")
+        except Exception as e:
+            print(f"\nERR::ERROR AL EDITAR: {e}. INTENTE DE NUEVO.")
+
+
+
+def delpalabra(r):
+    print("\nELIMINAR PALABRA")
+    while True:
+        try:
+            palabra = input("\nIngrese palabra: ").lower()
+            if r.exists(palabra):
+                r.delete(palabra)
+                print("\nPALABRA ELIMINADA CORRECTAMENTE")
+                break
+            else:
+                print("\nPALABRA NO EXISTENTE, INTENTE CON OTRA\n")
+        except Exception as e:
+            print(f"\nERR::ERROR AL ELIMINAR: {e}. INTENTE DE NUEVO.")
+
+
+def showpalabra(r):
+    print("\nLISTA DE PALABRAS")
+    try:
+        palabras = r.keys("*")
+        if palabras:
+            for palabra in palabras:
+                print(palabra.decode())
+        else:
+            print("\nEL DICCIONARIO ESTA VACIO.")
+    except Exception as e:
+        print(f"\nERR::ERROR AL MOSTRAR PALABRAS: {e}.")
+
+
+def seacpalabra(r):
+    print("\nBUSCAR SIGNIFICADO")
+    while True:
+        try:
+            palabra = input("\nIngrese palabra: ").lower()
+            significado = r.get(palabra)
+            if significado:
+                print(f"\n'{palabra}': {significado.decode()}")
+                break
+            else:
+                print("\nPALABRA NO EXISTENTE, INTENTE CON OTRA")
+        except Exception as e:
+            print(f"\nERR::ERROR AL BUSCAR SIGNIFICADO: {e}. INTENTE DE NUEVO.")
+
+
+while True:
+    print("\n\n--<| DICCIONARIO PANAMEÑO |>--")
+    print("1. Agregar nueva palabra.")
+    print("2. Editar palabra existente.")
+    print("3. Eliminar palabra existente.")
+    print("4. Ver listado de palabras.")
+    print("5. Buscar significado de palabra.")
+    print("6. Salir.")
+    try:
+        opcion = int(input("Opcion: "))
+    except Exception as e:
+        print(f"ERR::OPCION INVALIDA. {e}")
+        opcion = 999
+
+    if opcion == 1:
+        aggpalabra(r)
+    if opcion == 2:
+        editpalabra(r)
+    if opcion == 3:
+        delpalabra(r)
+    if opcion == 4:
+        showpalabra(r)
+    if opcion == 5:
+        seacpalabra(r)
+    if opcion == 6:
+        print("SALIENDO DEL DICCIONARIO")
+        r.close()
+        break
