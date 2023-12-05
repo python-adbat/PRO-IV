@@ -1,0 +1,122 @@
+import pymongo
+from pymongo.mongo_client import MongoClient
+import json
+
+uri =  "mongodb+srv://irving_buitrago:iebc0429@irvingg.hm4zgc1.mongodb.net/"
+cliente= MongoClient(uri)
+db = cliente["MiDiccionario"]
+coleccion = db["mispalabras"]
+
+def aggpalabra(coleccion):
+    print("\nAGREGAR PALABRA\n")
+    while True:
+        try:
+            palabra = input("Ingrese la nueva palabra: ").lower()
+            revisar = coleccion.find_one({"palabra": palabra})
+            if revisar:
+                print("\nPALABRA EXISTENTE, INTENTE CON OTRA.")
+            else:
+                significado = input("Ingrese el significado de la palabra: ")
+                nueva_palabra = {
+                    "palabra": palabra,
+                    "significado": significado,
+                }
+                resultado = coleccion.insert_one(nueva_palabra)
+                print("\nPalabra agregada exitosamente.")
+            break
+        except Exception as e:
+            print(f"\nERR::ERROR AL AGREGAR: {e}. INTENTE DE NUEVO.")
+
+
+def editpalabra(coleccion):
+    print("\nEDITAR PALABRA\n")
+    while True:
+        try:
+            palabra = input("Ingrese la palabra: ").lower()
+            revisar = coleccion.find_one({"palabra": palabra})
+            if revisar:
+                nuevo_significado = input("Ingrese el nuevo significado: ")
+                coleccion.update_one({"palabra": palabra}, {"$set": {"significado": nuevo_significado}})
+                print("\nPalabra actualizada exitosamente.")
+                break
+            else:
+                print("\nPALABRA NO EXISTENTE, INTENTE CON OTRA")
+        except Exception as e:
+            print(f"\nERR::ERROR AL EDITAR: {e}. INTENTE DE NUEVO.")
+
+
+def delpalabra(coleccion):
+    print("\nELIMINAR PALABRA")
+    while True:
+        try:
+            palabra = input("\nIngrese palabra: ").lower()
+            revisar = coleccion.find_one({"palabra": palabra})
+            if revisar:
+                coleccion.delete_one({"palabra": palabra})
+                print("\nPalabra elimanda existosamente")
+                break
+            else:
+                print("\nPALABRA NO EXISTENTE, INTENTE CON OTRA")
+        except Exception as e:
+            print(f"\nERR::ERROR AL ELIMINAR: {e}. INTENTE DE NUEVO.")
+
+
+def showpalabra(coleccion):
+    print("\nLISTA DE PALABRAS\n")
+    try:
+        palabras = coleccion.find({}, {"_id": 0, "palabra": 1})
+        count = 0
+
+        for palabra in palabras:
+            count += 1
+            print(palabra["palabra"])
+
+        if count == 0:
+            print("\nEL DICCIONARIO ESTÁ VACÍO.")
+    except Exception as e:
+        print(f"\nERR::ERROR AL MOSTRAR PALABRAS: {e}.")
+
+
+def seacpalabra(coleccion):
+    print("\nBUSCAR SIGNIFICADO")
+    while True:
+        try:
+            palabra = input("\nIngrese palabra a buscar: ").lower()
+            revisar = coleccion.find_one({"palabra": palabra})
+            if revisar:
+                print(f"'{palabra}': {revisar['significado']}")
+                break
+            else:
+                print("\nPALABRA NO EXISTENTE, INTENTE CON OTRA")
+        except Exception as e:
+            print(f"\nERR::ERROR AL ELIMINAR: {e}. INTENTE DE NUEVO.")
+
+
+while True:
+    print("\n\n--<| DICCIONARIO PANAMEÑO |>--")
+    print("1. Agregar nueva palabra.")
+    print("2. Editar palabra existente.")
+    print("3. Eliminar palabra existente.")
+    print("4. Ver listado de palabras.")
+    print("5. Buscar significado de palabra.")
+    print("6. Salir.")
+    try:
+        opcion = int(input("Opcion: "))
+    except Exception as e:
+        print(f"\nERR::Opcion invalida: {e}")
+        opcion = 999
+
+    if opcion == 1:
+        aggpalabra(coleccion)
+    if opcion == 2:
+        editpalabra(coleccion)
+    if opcion == 3:
+        delpalabra(coleccion)
+    if opcion == 4:
+        showpalabra(coleccion)
+    if opcion == 5:
+        seacpalabra(coleccion)
+    if opcion == 6:
+        print("SALIENDO DEL DICCIONARIO")
+        cliente.close()
+        break
